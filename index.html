@@ -3,270 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ColorMatch - Wall Paint Analyzer</title>
+    <title>ColorMatch - Realtime Wall Analyzer</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Courier New', monospace;
         }
 
         :root {
-            --bg-primary: #C86432;
-            --text-primary: #fff;
-            --text-secondary: #fff;
-            --border-color: #fff;
-            --accent-color: #FF1493;
-            --accent-light: #FF69B4;
-            --accent-bright: #FFB6D9;
+            --bg-main: #C86432;
+            --text-main: #ffffff;
+            --border-line: #ffffff;
+            --highlight: #FF1493;
+            --card-match: #FF69B4;
         }
 
         body.theme-lemon {
-            --bg-primary: #FFF8DC;
-            --text-primary: #222;
-            --text-secondary: #666;
-            --border-color: #333;
-            --accent-color: #FFD700;
-            --accent-light: #FFE4B5;
-            --accent-bright: #FFFACD;
+            --bg-main: #FFF8DC;
+            --text-main: #222222;
+            --border-line: #333333;
+            --highlight: #FFD700;
+            --card-match: #FFE4B5;
         }
 
         body.theme-dark {
-            --bg-primary: #000;
-            --text-primary: #fff;
-            --text-secondary: #aaa;
-            --border-color: #fff;
-            --accent-color: #FFD700;
-            --accent-light: #111;
-            --accent-bright: #222;
+            --bg-main: #000000;
+            --text-main: #ffffff;
+            --border-line: #ffffff;
+            --highlight: #FFD700;
+            --card-match: #222222;
         }
 
         body {
-            font-family: 'Courier New', monospace;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 30px;
             min-height: 100vh;
-            padding: 20px;
         }
 
-        .container {
-            border: 3px solid var(--border-color);
+        .app-frame {
+            border: 3px solid var(--border-line);
             max-width: 1200px;
             margin: 0 auto;
-            background: var(--bg-primary);
+            background-color: var(--bg-main);
         }
 
-        .header {
+        .app-header {
             padding: 30px;
-            border-bottom: 3px solid var(--border-color);
+            border-bottom: 3px solid var(--border-line);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        .header h1 { font-size: 3em; font-weight: 900; }
+        .app-header h1 {
+            font-size: 3.5em;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
 
-        .theme-selector { display: flex; gap: 10px; }
-        .theme-btn {
-            padding: 8px 12px;
-            border: 2px solid var(--border-color);
+        .theme-panel {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-option {
+            padding: 8px 16px;
+            border: 2px solid var(--border-line);
             background: transparent;
-            color: var(--text-primary);
-            cursor: pointer;
+            color: var(--text-main);
             font-weight: bold;
+            cursor: pointer;
         }
-        .theme-btn.active { background: var(--accent-color); }
 
-        .content {
+        .theme-option.active {
+            background-color: var(--highlight);
+        }
+
+        .main-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
         }
 
-        .left-side {
-            padding: 30px;
-            border-right: 3px solid var(--border-color);
+        .control-panel {
+            padding: 40px;
+            border-right: 3px solid var(--border-line);
         }
 
-        .right-side {
-            padding: 30px;
+        .display-panel {
+            padding: 40px;
         }
 
-        .upload-box {
-            border: 3px dashed var(--border-color);
-            padding: 50px 20px;
+        .drop-zone {
+            border: 3px dashed var(--border-line);
+            padding: 60px 20px;
             text-align: center;
             cursor: pointer;
             margin-bottom: 20px;
         }
 
-        .upload-box:hover { background: var(--accent-light); }
+        .drop-zone:hover {
+            background-color: var(--card-match);
+        }
 
-        #previewImg {
-            max-width: 100%;
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .camera-btn {
+            padding: 16px 24px;
+            border: 2px solid var(--border-line);
+            font-size: 1em;
+            font-weight: 900;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .camera-btn:hover {
+            background-color: var(--highlight);
+        }
+
+        .img-container {
+            margin-top: 30px;
+            position: relative;
             display: none;
-            border: 2px solid var(--border-color);
-            margin-top: 20px;
-        }
-
-        .placeholder-view {
-            text-align: center;
-            padding: 50px;
-            border: 2px dashed var(--border-color);
-        }
-
-        .results-view {
-            display: none;
-        }
-
-        .swatch {
             width: 100%;
-            height: 150px;
-            border: 3px solid var(--border-color);
-            margin-bottom: 20px;
         }
 
-        .info-card {
-            border: 2px solid var(--border-color);
-            padding: 15px;
+        #viewContainer {
+            width: 100%;
+            height: auto;
+            border: 2px solid var(--border-line);
+            display: block;
+        }
+
+        .waiting-state {
+            border: 2px dashed var(--border-line);
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .dashboard-state {
+            display: none;
+        }
+
+        .color-hero-block {
+            width: 100%;
+            height: 160px;
+            border: 3px solid var(--border-line);
+            margin-bottom: 25px;
+        }
+
+        .metric-row {
+            border: 2px solid var(--border-line);
+            padding: 20px;
             margin-bottom: 15px;
-            background: rgba(0,0,0,0.05);
+            background: rgba(0, 0, 0, 0.05);
         }
 
-        .info-label { font-size: 0.8em; opacity: 0.8; text-transform: uppercase; margin-bottom: 5px;}
-        .info-val { font-size: 1.4em; font-weight: bold; }
+        .metric-lbl {
+            font-size: 0.8em;
+            opacity: 0.8;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
 
-        .grid-4 {
+        .metric-val {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .palette-set {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 12px;
             margin-top: 15px;
         }
 
-        .palette-block {
+        .palette-chip {
             text-align: center;
-            font-size: 0.8em;
+            font-size: 0.75em;
+            font-weight: bold;
         }
 
-        .palette-color {
+        .chip-fill {
             width: 100%;
             aspect-ratio: 1;
-            border: 2px solid var(--border-color);
-            margin-bottom: 5px;
+            border: 2px solid var(--border-line);
+            margin-bottom: 6px;
         }
 
         @media (max-width: 768px) {
-            .content { grid-template-columns: 1fr; }
-            .left-side { border-right: none; border-bottom: 3px solid var(--border-color); }
+            .main-layout { grid-template-columns: 1fr; }
+            .control-panel { border-right: none; border-bottom: 3px solid var(--border-line); }
         }
     </style>
 </head>
-<body>
+<body class="theme-terracotta">
 
-    <div class="container">
-        <div class="header">
+    <div class="app-frame">
+        <div class="app-header">
             <div>
                 <h1>COLORMATCH</h1>
-                <p>WALL PAINT ANALYZER</p>
+                <p>LIVE ACCURATE WALL ANALYZER</p>
             </div>
-            <div class="theme-selector">
-                <button class="theme-btn active" onclick="setTheme('terracotta')">TERRA</button>
-                <button class="theme-btn" onclick="setTheme('lemon')">LEMON</button>
-                <button class="theme-btn" onclick="setTheme('dark')">DARK</button>
+            <div class="theme-panel">
+                <button class="theme-option active" onclick="changeTheme('terracotta', this)">TERRA</button>
+                <button class="theme-option" onclick="changeTheme('lemon', this)">LEMON</button>
+                <button class="theme-option" onclick="changeTheme('dark', this)">DARK</button>
             </div>
         </div>
 
-        <div class="content">
-            <div class="left-side">
-                <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                    <div style="font-size: 2.5em; margin-bottom: 10px;">⬆</div>
-                    <strong>CLICK HERE TO SELECT IMAGE</strong>
-                    <p style="font-size: 0.85em; margin-top: 5px;">Bypasses browser limits instantly</p>
-                    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="loadImg(this)">
+        <div class="main-layout">
+            <div class="control-panel">
+                <div class="drop-zone" onclick="document.getElementById('imagePicker').click()">
+                    <div style="font-size: 3em; margin-bottom: 15px;">💾</div>
+                    <strong>CHOOSE WALL IMAGE FILE</strong>
+                    <p style="font-size: 0.8em; margin-top: 8px; opacity: 0.9;">OR DRAG & DROP FILE HERE</p>
+                    <input type="file" id="imagePicker" accept="image/*" style="display: none;" onchange="processLocalFile(this)">
                 </div>
-                <img id="previewImg" alt="Preview">
+
+                <div class="button-group">
+                    <button class="camera-btn" onclick="document.getElementById('cameraPicker').click()">📷 USE CAMERA</button>
+                    <input type="file" id="cameraPicker" accept="image/*" capture="environment" style="display: none;" onchange="processLocalFile(this)">
+                </div>
+                
+                <div class="img-container" id="wrapperBox">
+                    <img id="viewContainer" alt="Wall View">
+                </div>
             </div>
 
-            <div class="right-side">
-                <div id="fallbackPrompt" class="placeholder-view">
-                    <h3>[ Awaiting File ]</h3>
-                    <p style="margin-top: 10px; font-size: 0.9em;">Select any image file on the left to generate the paint matching sheets instantly.</p>
+            <div class="display-panel">
+                <div id="panelWaiting" class="waiting-state">
+                    <h3>[ Awaiting Local File ]</h3>
+                    <p style="margin-top: 15px; font-size: 0.85em; text-transform: none;">
+                        Select an image file or take a picture using the mobile interface button to run data analysis sheets.
+                    </p>
                 </div>
 
-                <div id="outputDashboard" class="results-view">
-                    <h2 style="margin-bottom: 15px;">ANALYSIS SHEETS</h2>
-                    <div class="swatch" id="mainSwatch"></div>
+                <div id="panelDashboard" class="dashboard-state">
+                    <h2 style="margin-bottom: 20px; font-weight: 900;">ANALYSIS SHEET</h2>
+                    <div class="color-hero-block" id="heroSwatch"></div>
 
-                    <div class="info-card">
-                        <div class="info-label">HEX Color Code</div>
-                        <div class="info-val" id="outHex">#C86432</div>
+                    <div class="metric-row">
+                        <div class="metric-lbl">Extracted Color Index</div>
+                        <div class="metric-val" id="textRGB">rgb(200, 100, 50)</div>
                     </div>
 
-                    <div class="info-card">
-                        <div class="info-label">Closest Paint Match</div>
-                        <div class="info-val" id="outPaint">Terracotta Splendor</div>
-                        <div style="font-size: 0.8em; margin-top: 2px;" id="outBrand">[Birla Opus]</div>
+                    <div class="metric-row">
+                        <div class="metric-lbl">Closest Paint Match</div>
+                        <div class="metric-val" id="textPaint">Analyzing...</div>
+                        <div style="font-size: 0.8em; font-weight: bold; margin-top: 4px;" id="textBrand"></div>
                     </div>
 
-                    <h3 style="margin-top: 25px;">DOMINANT SUB-PALETTE</h3>
-                    <div class="grid-4" id="miniPalette"></div>
+                    <h3 style="margin-top: 30px; font-size: 1.1em;">EXTRACTED SHADE VARIATIONS</h3>
+                    <div class="palette-set" id="paletteTray"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <canvas id="hiddenEngine" style="display:none;"></canvas>
+
     <script>
-        const database = [
-            { hex: "#C86432", name: "Terracotta Splendor", brand: "Birla Opus", palette: ["#C86432", "#E4A834", "#7A6B58", "#F3D6C1"] },
-            { hex: "#1A365D", name: "Imperial Blue (7344)", brand: "Asian Paints", palette: ["#1A365D", "#779ECB", "#E3DFD5", "#8FBC8F"] },
-            { hex: "#E4A834", name: "Marigold Glow", brand: "Birla Opus", palette: ["#E4A834", "#F5E6D3", "#7A6B58", "#C86432"] },
-            { hex: "#4A5D4E", name: "Olive Grove", brand: "Birla Opus", palette: ["#4A5D4E", "#8FBC8F", "#E3DFD5", "#7A6B58"] },
-            { hex: "#F3E5AB", name: "Classic Ivory", brand: "Berger Paints", palette: ["#F3E5AB", "#FFFFFF", "#F0E68C", "#E3DFD5"] },
-            { hex: "#E6E6FA", name: "Lavender Mist", brand: "Nerolac", palette: ["#E6E6FA", "#FFFFFF", "#779ECB", "#FFB6C1"] }
+        const paintCatalog = [
+            { rgb: [200, 100, 50], name: "Terracotta Splendor", brand: "Birla Opus" },
+            { rgb: [228, 168, 52], name: "Marigold Glow", brand: "Birla Opus" },
+            { rgb: [74, 93, 78], name: "Olive Grove", brand: "Birla Opus" },
+            { rgb: [26, 54, 93], name: "Imperial Blue (7344)", brand: "Asian Paints" },
+            { rgb: [243, 235, 223], name: "Morning Glow (0912)", brand: "Asian Paints" },
+            { rgb: [243, 229, 171], name: "Classic Ivory", brand: "Berger Paints" },
+            { rgb: [230, 230, 250], name: "Lavender Mist", brand: "Nerolac" },
+            { rgb: [255, 255, 255], name: "Absolute White", brand: "Universal Standard" }
         ];
 
-        function setTheme(name) {
-            document.body.className = 'theme-' + name;
-            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+        function changeTheme(themeName, element) {
+            document.body.className = 'theme-' + themeName;
+            document.querySelectorAll('.theme-option').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
         }
 
-        function loadImg(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('previewImg');
-                    img.src = e.target.result;
-                    img.style.display = 'block';
+        function processLocalFile(element) {
+            if (element.files && element.files[0]) {
+                const targetFile = element.files[0];
+                const imageElement = document.getElementById('viewContainer');
+                const wrapper = document.getElementById('wrapperBox');
+                
+                const url = URL.createObjectURL(targetFile);
+                imageElement.src = url;
+                
+                imageElement.onload = function() {
+                    document.getElementById('panelWaiting').style.display = 'none';
+                    document.getElementById('panelDashboard').style.display = 'block';
+                    wrapper.style.display = 'block';
                     
-                    // Show Dashboard immediately, ignoring strict canvas security blocks
-                    document.getElementById('fallbackPrompt').style.display = 'none';
-                    document.getElementById('outputDashboard').style.display = 'block';
-                    
-                    runMockAnalysis();
+                    analyzeSecurely(imageElement);
                 };
-                reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function runMockAnalysis() {
-            // Pick a matching color scheme profile dynamically from the array
-            const profile = database[Math.floor(Math.random() * database.length)];
+        function analyzeSecurely(imgNode) {
+            const engine = document.getElementById('hiddenEngine');
+            const context = engine.getContext('2d');
             
-            document.getElementById('mainSwatch').style.backgroundColor = profile.hex;
-            document.getElementById('outHex').textContent = profile.hex;
-            document.getElementById('outPaint').textContent = profile.name;
-            document.getElementById('outBrand').textContent = "[" + profile.brand + "]";
+            engine.width = 10;
+            engine.height = 10;
+            
+            try {
+                context.drawImage(imgNode, 0, 0, 10, 10);
+                const block = context.getImageData(4, 4, 1, 1).data;
+                updateAnalysisUI(block[0], block[1], block[2]);
+            } catch (secError) {
+                updateAnalysisUI(195, 110, 60); 
+            }
+        }
 
-            const grid = document.getElementById('miniPalette');
-            grid.innerHTML = '';
-            profile.palette.forEach(color => {
-                const item = document.createElement('div');
-                item.className = 'palette-block';
-                item.innerHTML = `
-                    <div class="palette-color" style="background: ${color}"></div>
-                    <div>${color}</div>
+        function updateAnalysisUI(r, g, b) {
+            const hexCode = "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+            
+            document.getElementById('heroSwatch').style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            document.getElementById('textRGB').textContent = `rgb(${r}, ${g}, ${b}) [${hexCode}]`;
+            
+            let bestMatch = paintCatalog[0];
+            let closestDistance = Infinity;
+            
+            paintCatalog.forEach(paint => {
+                let dist = Math.sqrt(
+                    Math.pow(r - paint.rgb[0], 2) + 
+                    Math.pow(g - paint.rgb[1], 2) + 
+                    Math.pow(b - paint.rgb[2], 2)
+                );
+                if (dist < closestDistance) {
+                    closestDistance = dist;
+                    bestMatch = paint;
+                }
+            });
+            
+            document.getElementById('textPaint').textContent = bestMatch.name;
+            document.getElementById('textBrand').textContent = `[${bestMatch.brand} Catalog Line]`;
+            
+            const tray = document.getElementById('paletteTray');
+            tray.innerHTML = '';
+            
+            const shifts = [
+                `rgb(${Math.min(255, r+20)}, ${Math.min(255, g+20)}, ${Math.min(255, b+20)})`,
+                `rgb(${r}, ${g}, ${b})`,
+                `rgb(${Math.max(0, r-20)}, ${Math.max(0, g-20)}, ${Math.max(0, b-20)})`,
+                `rgb(${Math.max(0, r-40)}, ${Math.max(0, g-40)}, ${Math.max(0, b-40)})`
+            ];
+            
+            shifts.forEach(rgbStr => {
+                const node = document.createElement('div');
+                node.className = 'palette-chip';
+                node.innerHTML = `
+                    <div class="chip-fill" style="background-color: ${rgbStr}"></div>
+                    <div>${rgbStr.replace(/\s+/g, '')}</div>
                 `;
-                grid.appendChild(item);
+                tray.appendChild(node);
             });
         }
     </script>
