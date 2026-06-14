@@ -88,6 +88,12 @@
             padding: 8px 16px;
         }
 
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .header-title {
             font-size: 2rem;
             font-weight: 900;
@@ -95,16 +101,29 @@
             margin: 0;
         }
 
+        /* Vector Line Drawing Settings Icon */
         .settings-trigger {
             background: var(--panel-bg);
             border: 2px solid var(--border);
             box-shadow: 2px 2px 0px var(--shadow);
-            font-size: 1.4rem;
-            padding: 4px 8px;
+            padding: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 34px;
+            height: 34px;
+            box-sizing: border-box;
+        }
+
+        .settings-trigger svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: var(--text);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .settings-trigger:active {
@@ -112,24 +131,24 @@
             box-shadow: 1px 1px 0px var(--shadow);
         }
 
-        /* SIDEBAR SYSTEM ELEMENT OBJECTS */
+        /* LEFT-SIDEBAR SYSTEM NAVIGATION DESIGN */
         .settings-sidebar {
             position: fixed;
             top: 0;
-            right: -320px; /* Hidden offscreen by default */
+            left: -320px; /* Shifted to hide offscreen left */
             width: 280px;
             height: 100%;
             background-color: var(--panel-bg);
-            border-left: var(--brutal-thickness) solid var(--border);
-            box-shadow: -5px 0px 0px var(--shadow);
+            border-right: var(--brutal-thickness) solid var(--border);
+            box-shadow: 5px 0px 0px var(--shadow);
             z-index: 1000;
             padding: 20px;
             box-sizing: border-box;
-            transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .settings-sidebar.open {
-            right: 0; /* Slides out into viewpoint */
+            left: 0; /* Slides out from the left boundary edge */
         }
 
         .sidebar-overlay {
@@ -290,10 +309,16 @@
         .shade-badge {
             background: var(--bg);
             border: 2px solid var(--border);
-            padding: 3px 6px;
+            padding: 4px 8px;
             font-size: 10px;
             font-weight: bold;
             text-transform: uppercase;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .shade-badge:active {
+            transform: scale(0.95);
         }
 
         .shade-badge.highlight {
@@ -354,8 +379,15 @@
 <div class="dashboard-container">
     
     <div class="header-wrapper">
-        <h1 class="header-title">ColorMatch Engine</h1>
-        <button type="button" class="settings-trigger" onclick="toggleSidebar(true)">⚙️</button>
+        <div class="brand-container">
+            <button type="button" class="settings-trigger" onclick="toggleSidebar(true)" title="Open Hub Config">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+            <h1 class="header-title">ColorMatch Engine</h1>
+        </div>
     </div>
 
     <div class="brutal-box">
@@ -445,7 +477,7 @@
 
     let currentHexGlobal = '#F090A4';
 
-    // Toggle Sidebar visibility routine state changes
+    // Toggle Sidebar visibility routine state changes (Re-routed to Left)
     function toggleSidebar(shouldOpen) {
         const sidebar = document.getElementById('settingsSidebar');
         const overlay = document.getElementById('sidebarOverlay');
@@ -471,13 +503,34 @@
         }
 
         if (matchedChip) {
-            updateDashboardUI(matchedChip.rgb[0], matchedChip.rgb[1], matchedChip.rgb[2]);
+            updateDashboardUI(matchedChip.rgb[0], matchedChip.rgb[1], matchedChip.rgb[2], matchedChip);
         } else {
             if (!query.startsWith('#')) query = '#' + query;
             if (/^#[0-9A-F]{6}$/i.test(query)) {
                 let rgb = hexToRgb(query);
-                updateDashboardUI(rgb.r, rgb.g, rgb.b);
+                updateDashboardUI(rgb.r, rgb.g, rgb.b, null);
             }
+        }
+    }
+
+    // Direct execution injection node mapping for manual interactive chip overrides
+    function loadDirectShadeFromCode(familyPrefix, codeNumber) {
+        const fullTargetCode = `${familyPrefix}${codeNumber}`;
+        
+        // Custom override logic mapping specifically for hardcoded fandeck overrides
+        if (familyPrefix === 'PP' && codeNumber === 4003) { forceHexMatch('#F090A4'); return; }
+        if (familyPrefix === 'YY' && codeNumber === 1000) { forceHexMatch('#0B132B'); return; }
+        if (familyPrefix === 'RD' && codeNumber === 5016) { forceHexMatch('#E27278'); return; }
+
+        // General structural search lookup matching engine paths
+        let exactMatch = birlaOpusCatalog.find(item => {
+            let itemCodeStart = item.familyStart;
+            let itemCodeEnd = item.familyEnd;
+            return item.familyPrefix === familyPrefix && codeNumber >= itemCodeStart && codeNumber <= itemCodeEnd;
+        });
+
+        if (exactMatch) {
+            updateDashboardUI(exactMatch.rgb[0], exactMatch.rgb[1], exactMatch.rgb[2], exactMatch);
         }
     }
 
@@ -503,7 +556,7 @@
                     
                     try {
                         const pixelData = ctx.getImageData(5, 5, 1, 1).data;
-                        updateDashboardUI(pixelData[0], pixelData[1], pixelData[2]);
+                        updateDashboardUI(pixelData[0], pixelData[1], pixelData[2], null);
                     } catch (e) {
                         let name = imgFile.name.toUpperCase();
                         if (name.includes("PP") || name.includes("4003")) forceHexMatch("#F090A4");
@@ -516,7 +569,7 @@
         }
     }
 
-    function updateDashboardUI(r, g, b) {
+    function updateDashboardUI(r, g, b, preMatchedItem) {
         if (birlaOpusCatalog.length === 0) return;
         document.getElementById('panelWaiting').style.display = 'none';
         document.getElementById('panelDashboard').style.display = 'block';
@@ -528,16 +581,17 @@
         document.getElementById('heroSwatch').style.backgroundColor = hexCode;
         document.getElementById('textRGB').textContent = `rgb(${r}, ${g}, ${b}) [${hexCode}]`;
 
-        let exactMatch = birlaOpusCatalog[0];
-        let deltaMin = Infinity;
-
-        birlaOpusCatalog.forEach(item => {
-            const distance = calculatePerceptualDistance({r, g, b}, {r: item.rgb[0], g: item.rgb[1], b: item.rgb[2]});
-            if (distance < deltaMin) {
-                deltaMin = distance;
-                exactMatch = item;
-            }
-        });
+        let exactMatch = preMatchedItem;
+        if (!exactMatch) {
+            let deltaMin = Infinity;
+            birlaOpusCatalog.forEach(item => {
+                const distance = calculatePerceptualDistance({r, g, b}, {r: item.rgb[0], g: item.rgb[1], b: item.rgb[2]});
+                if (distance < deltaMin) {
+                    deltaMin = distance;
+                    exactMatch = item;
+                }
+            });
+        }
 
         document.getElementById('textPaint').textContent = exactMatch.name;
         
@@ -586,9 +640,13 @@
             const codeString = `${prefix}${currentCode}`;
             badge.textContent = codeString;
             
+            // Highlight checking routines
             if (matchedItem.name === 'Pink Azaleas' && currentCode === 4003) badge.className += ' highlight';
             if (matchedItem.name === 'Mumbai at Midnight' && currentCode === 1000) badge.className += ' highlight';
             if (matchedItem.name === 'Mimosas at Sunset' && currentCode === 5016) badge.className += ' highlight';
+
+            // INTERACTIVE CAPTURE BOUND NODE TRIGGER PIPELINES
+            badge.setAttribute('onclick', `loadDirectShadeFromCode('${prefix}', ${currentCode})`);
 
             badgeContainer.appendChild(badge);
         }
@@ -613,6 +671,7 @@
         }
     }
 
+    // Handles layout theme variations
     function changeTheme(theme, element) {
         document.body.className = 'theme-' + theme;
         document.querySelectorAll('.theme-option').forEach(btn => btn.classList.remove('active'));
