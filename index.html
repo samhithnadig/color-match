@@ -17,9 +17,35 @@
             --brutal-thickness: 4px;
         }
 
-      
+        .theme-terracotta {
+            --bg: #f4e8e1;
+            --panel-bg: #ffffff;
+            --text: #2b1a13;
+            --border: #2b1a13;
+            --shadow: #2b1a13;
+            --accent: #d35400;
+            --accent-hover: #ba4a00;
+        }
 
-        
+        .theme-lemon {
+            --bg: #fef9e7;
+            --panel-bg: #ffffff;
+            --text: #2c3e50;
+            --border: #1a1a1a;
+            --shadow: #1a1a1a;
+            --accent: #f1c40f;
+            --accent-hover: #d4ac0d;
+        }
+
+        .theme-dark {
+            --bg: #121212;
+            --panel-bg: #1e1e1e;
+            --text: #f5f5f5;
+            --border: #f5f5f5;
+            --shadow: #f5f5f5;
+            --accent: #4a90a4;
+            --accent-hover: #3a788a;
+        }
 
         body {
             font-family: 'Courier New', Courier, monospace;
@@ -29,6 +55,7 @@
             padding: 20px;
             box-sizing: border-box;
             transition: background-color 0.2s, color 0.2s;
+            overflow-x: hidden;
         }
 
         /* Brutalist Container Elements */
@@ -38,6 +65,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+            position: relative;
         }
 
         .brutal-box {
@@ -48,39 +76,113 @@
             position: relative;
         }
 
-        .header-title {
+        /* Header Layout Matrix */
+        .header-wrapper {
             grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--accent);
+            border: var(--brutal-thickness) solid var(--border);
+            box-shadow: var(--brutal-thickness) var(--brutal-thickness) 0px var(--shadow);
+            padding: 8px 16px;
+        }
+
+        .header-title {
             font-size: 2rem;
             font-weight: 900;
             text-transform: uppercase;
             margin: 0;
-            padding: 12px;
-            background-color: var(--accent);
-            border: var(--brutal-thickness) solid var(--border);
-            box-shadow: var(--brutal-thickness) var(--brutal-thickness) 0px var(--shadow);
-            text-align: center;
+        }
+
+        .settings-trigger {
+            background: var(--panel-bg);
+            border: 2px solid var(--border);
+            box-shadow: 2px 2px 0px var(--shadow);
+            font-size: 1.4rem;
+            padding: 4px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-trigger:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px var(--shadow);
+        }
+
+        /* SIDEBAR SYSTEM ELEMENT OBJECTS */
+        .settings-sidebar {
+            position: fixed;
+            top: 0;
+            right: -320px; /* Hidden offscreen by default */
+            width: 280px;
+            height: 100%;
+            background-color: var(--panel-bg);
+            border-left: var(--brutal-thickness) solid var(--border);
+            box-shadow: -5px 0px 0px var(--shadow);
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .settings-sidebar.open {
+            right: 0; /* Slides out into viewpoint */
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            display: none;
+        }
+
+        .sidebar-overlay.open {
+            display: block;
+        }
+
+        .sidebar-close-btn {
+            background: var(--accent);
+            border: 2px solid var(--border);
+            font-weight: bold;
+            padding: 4px 8px;
+            cursor: pointer;
+            float: right;
+            box-shadow: 2px 2px 0px var(--shadow);
         }
 
         /* Controls & Theme Switchers */
         .theme-selector {
             display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
         }
 
         .theme-option {
-            flex: 1;
-            padding: 6px 10px;
-            border: 2px solid var(--border);
+            width: 100%;
+            padding: 10px;
+            border: 3px solid var(--border);
             background: var(--panel-bg);
             color: var(--text);
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0px var(--shadow);
+            text-align: left;
         }
 
         .theme-option.active {
             background: var(--accent);
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0px var(--shadow);
         }
 
         .action-btn {
@@ -227,26 +329,38 @@
         @media (max-width: 768px) {
             body { padding: 12px; }
             .dashboard-container { grid-template-columns: 1fr; gap: 15px; }
-            .header-title { font-size: 1.3rem; padding: 8px; box-shadow: 3px 3px 0px var(--shadow); }
+            .header-wrapper { padding: 6px 12px; box-shadow: 3px 3px 0px var(--shadow); }
+            .header-title { font-size: 1.3rem; }
             .brutal-box { padding: 15px; box-shadow: 3px 3px 0px var(--shadow); }
         }
     </style>
 </head>
 <body class="theme-terracotta">
 
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+
+<div class="settings-sidebar" id="settingsSidebar">
+    <button type="button" class="sidebar-close-btn" onclick="toggleSidebar(false)">X</button>
+    <h3 style="margin-top: 0; text-transform: uppercase; border-bottom: 2px solid var(--border); padding-bottom: 8px;">Control Hub</h3>
+    
+    <label style="font-weight: bold; font-size: 0.85rem; display: block; margin-top: 15px;">SELECT SYSTEM INTERFACE THEME:</label>
+    <div class="theme-selector">
+        <button type="button" class="theme-option active" onclick="changeTheme('terracotta', this)">Terracotta Red</button>
+        <button type="button" class="theme-option" onclick="changeTheme('lemon', this)">Lemon Yellow</button>
+        <button type="button" class="theme-option" onclick="changeTheme('dark', this)">Dark Mode</button>
+    </div>
+</div>
+
 <div class="dashboard-container">
     
-    <h1 class="header-title">ColorMatch Engine</h1>
+    <div class="header-wrapper">
+        <h1 class="header-title">ColorMatch Engine</h1>
+        <button type="button" class="settings-trigger" onclick="toggleSidebar(true)">⚙️</button>
+    </div>
 
     <div class="brutal-box">
         <div class="bot-status-tag" id="systemStatus">LOADING ENGINE CATALOG...</div>
         <h3 style="margin-top: 0; font-size: 1.1rem;">System Input Matrix</h3>
-        
-        <div class="theme-selector">
-            <button type="button" class="theme-option active" onclick="changeTheme('terracotta', this)">Terracotta</button>
-            <button type="button" class="theme-option" onclick="changeTheme('lemon', this)">Lemon</button>
-            <button type="button" class="theme-option" onclick="changeTheme('dark', this)">Dark</button>
-        </div>
 
         <div class="upload-group">
             <label style="display:block; font-weight:bold; font-size: 0.85rem;">1. ACQUIRE IMAGE DATA SOURCE:</label>
@@ -311,10 +425,9 @@
 </div>
 
 <script>
-    // Empty dataset baseline variable layout tracking
     let birlaOpusCatalog = [];
 
-    // ASYNCHRONOUS INITIALIZATION: Fetches external local json file structural arrays on boot
+    // ASYNCHRONOUS INITIALIZATION: Loads database file
     window.onload = async function() {
         try {
             const response = await fetch('catalog.json');
@@ -322,7 +435,7 @@
             birlaOpusCatalog = await response.json();
             
             document.getElementById('systemStatus').textContent = "JS CLIENT-SIDE BOT READY";
-            forceHexMatch('#F090A4'); // Triggers initial system match layout setup
+            forceHexMatch('#F090A4'); 
         } catch (error) {
             console.error("Initialization failure: ", error);
             document.getElementById('systemStatus').textContent = "CATALOG ERROR: JSON MISSING";
@@ -331,6 +444,19 @@
     };
 
     let currentHexGlobal = '#F090A4';
+
+    // Toggle Sidebar visibility routine state changes
+    function toggleSidebar(shouldOpen) {
+        const sidebar = document.getElementById('settingsSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (shouldOpen) {
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+        } else {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+    }
 
     function forceHexMatch(hexInput) {
         if (birlaOpusCatalog.length === 0) return;
