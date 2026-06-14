@@ -251,22 +251,10 @@
 
         /* MOBILE OPTIMIZATION OVERRIDES */
         @media (max-width: 768px) {
-            body {
-                padding: 12px;
-            }
-            .dashboard-container { 
-                grid-template-columns: 1fr; /* Stacks layout linearly */
-                gap: 15px;
-            }
-            .header-title {
-                font-size: 1.3rem; /* Scales font gracefully to avoid clogging space */
-                padding: 8px;
-                box-shadow: 3px 3px 0px var(--shadow);
-            }
-            .brutal-box {
-                padding: 15px;
-                box-shadow: 3px 3px 0px var(--shadow);
-            }
+            body { padding: 12px; }
+            .dashboard-container { grid-template-columns: 1fr; gap: 15px; }
+            .header-title { font-size: 1.3rem; padding: 8px; box-shadow: 3px 3px 0px var(--shadow); }
+            .brutal-box { padding: 15px; box-shadow: 3px 3px 0px var(--shadow); }
         }
     </style>
 </head>
@@ -277,7 +265,7 @@
     <h1 class="header-title">ColorMatch Engine</h1>
 
     <div class="brutal-box">
-        <div class="bot-status-tag" id="systemStatus">JS CLIENT-SIDE BOT READY</div>
+        <div class="bot-status-tag" id="systemStatus">LOADING ENGINE CATALOG...</div>
         <h3 style="margin-top: 0; font-size: 1.1rem;">System Input Matrix</h3>
         
         <div class="theme-selector">
@@ -349,76 +337,29 @@
 </div>
 
 <script>
-    const birlaOpusCatalog = [
-        { hex: '#F8F9FA', rgb: [248, 249, 250], name: 'White Linen', familyPrefix: 'WT', familyStart: 1000, familyEnd: 1007 },
-        { hex: '#ECECEC', rgb: [236, 236, 236], name: 'River Rapids', familyPrefix: 'WT', familyStart: 1008, familyEnd: 1015 },
-        { hex: '#FDFBF7', rgb: [253, 251, 247], name: 'Jasmine in Her Hair', familyPrefix: 'WT', familyStart: 1016, familyEnd: 1023 },
-        { hex: '#F1EEEB', rgb: [241, 238, 235], name: 'Tip of the Iceberg', familyPrefix: 'WT', familyStart: 1024, familyEnd: 1031 },
-        { hex: '#FFFEF2', rgb: [255, 254, 242], name: 'Popcorn Flowers', familyPrefix: 'WT', familyStart: 1032, familyEnd: 1039 },
-        { hex: '#F4F2EF', rgb: [244, 242, 239], name: 'Introspection', familyPrefix: 'WT', familyStart: 1040, familyEnd: 1047 },
-        { hex: '#F7F4F0', rgb: [247, 244, 240], name: 'Steamed Rice', familyPrefix: 'WT', familyStart: 1048, familyEnd: 1055 },
-        { hex: '#FFD700', rgb: [255, 215, 0], name: 'Pineapple Juice', familyPrefix: 'YW', familyStart: 2000, familyEnd: 2007 },
-        { hex: '#FEE187', rgb: [254, 225, 135], name: 'Good Morning Sunshine', familyPrefix: 'YW', familyStart: 2008, familyEnd: 2015 },
-        { hex: '#FFFACD', rgb: [255, 250, 205], name: 'Cream Yellow', familyPrefix: 'YW', familyStart: 2016, familyEnd: 2023 },
-        { hex: '#FFE5B4', rgb: [255, 229, 180], name: 'Sponge Cake', familyPrefix: 'YW', familyStart: 2024, familyEnd: 2031 },
-        { hex: '#FFDB58', rgb: [255, 219, 88], name: 'Sunflowers in the Wind', familyPrefix: 'YW', familyStart: 2032, familyEnd: 2039 },
-        { hex: '#E6C655', rgb: [230, 198, 85], name: 'Jackfruit Pulp', familyPrefix: 'YW', familyStart: 2040, familyEnd: 2047 },
-        { hex: '#FFFF99', rgb: [255, 255, 153], name: 'Lemon Scoop', familyPrefix: 'YW', familyStart: 2048, familyEnd: 2055 },
-        { hex: '#F5F5DC', rgb: [245, 245, 220], name: 'Chalk', familyPrefix: 'YW', familyStart: 2056, familyEnd: 2063 },
-        { hex: '#FFBA00', rgb: [255, 186, 0], name: 'Mango Float', familyPrefix: 'OR', familyStart: 3000, familyEnd: 3007 },
-        { hex: '#FFA500', rgb: [255, 165, 0], name: 'Golden Tiger', familyPrefix: 'OR', familyStart: 3008, familyEnd: 3015 },
-        { hex: '#E8B817', rgb: [232, 184, 23], name: 'Turmeric is Gold', familyPrefix: 'OR', familyStart: 3016, familyEnd: 3023 },
-        { hex: '#FF8C00', rgb: [255, 140, 0], name: 'Flame Yellow', familyPrefix: 'OR', familyStart: 3024, familyEnd: 3031 },
-        { hex: '#FFB347', rgb: [255, 179, 71], name: 'Sun in the Water', familyPrefix: 'OR', familyStart: 3032, familyEnd: 3039 },
-        { hex: '#FFCB69', rgb: [255, 203, 105], name: 'Steamed Apricots', familyPrefix: 'OR', familyStart: 3040, familyEnd: 3047 },
-        { hex: '#FFB6C1', rgb: [255, 182, 193], name: 'Pink Cloud', familyPrefix: 'PP', familyStart: 4000, familyEnd: 4007 },
-        { hex: '#FFC0CB', rgb: [255, 192, 203], name: 'Baby Pink', familyPrefix: 'PP', familyStart: 4008, familyEnd: 4015 },
-        { hex: '#FF69B4', rgb: [255, 105, 180], name: 'Dahlia Buds', familyPrefix: 'PP', familyStart: 4016, familyEnd: 4023 },
-        { hex: '#F090A4', rgb: [240, 144, 164], name: 'Pink Azaleas', familyPrefix: 'PP', familyStart: 4000, familyEnd: 4007 },
-        { hex: '#FF1493', rgb: [255, 20, 147], name: 'Rose Pink', familyPrefix: 'PP', familyStart: 4024, familyEnd: 4031 },
-        { hex: '#DE3163', rgb: [222, 49, 99], name: 'Roja Pink', familyPrefix: 'RD', familyStart: 5000, familyEnd: 5007 },
-        { hex: '#B22222', rgb: [178, 34, 34], name: 'Wine Pink', familyPrefix: 'RD', familyStart: 5008, familyEnd: 5015 },
-        { hex: '#E27278', rgb: [226, 114, 120], name: 'Mimosas at Sunset', familyPrefix: 'RD', familyStart: 5016, familyEnd: 5023 },
-        { hex: '#FF4500', rgb: [255, 69, 0], name: 'Narangi', familyPrefix: 'RD', familyStart: 5024, familyEnd: 5031 },
-        { hex: '#00BFFF', rgb: [0, 191, 255], name: 'Summer in Leh', familyPrefix: 'BL', familyStart: 6000, familyEnd: 6007 },
-        { hex: '#6495ED', rgb: [100, 149, 237], name: 'Cornflowers are Blue', familyPrefix: 'BL', familyStart: 6008, familyEnd: 6015 },
-        { hex: '#E6E6FA', rgb: [230, 230, 250], name: 'Periwinkle Blue', familyPrefix: 'BL', familyStart: 6016, familyEnd: 6023 },
-        { hex: '#87CEEB', rgb: [135, 206, 235], name: 'Into the Light', familyPrefix: 'BL', familyStart: 6024, familyEnd: 6031 },
-        { hex: '#B0E0E6', rgb: [176, 224, 230], name: 'Forgotten Summer', familyPrefix: 'BL', familyStart: 6032, familyEnd: 6039 },
-        { hex: '#1E90FF', rgb: [30, 144, 255], name: 'Flaneurs Thrive in Cities', familyPrefix: 'BL', familyStart: 6040, familyEnd: 6047 },
-        { hex: '#4169E1', rgb: [65, 105, 225], name: 'Bombay Monsoon', familyPrefix: 'YY', familyStart: 1008, familyEnd: 1015 },
-        { hex: '#0B132B', rgb: [11, 19, 43], name: 'Mumbai at Midnight', familyPrefix: 'YY', familyStart: 1000, familyEnd: 1007 },
-        { hex: '#1C3144', rgb: [28, 49, 68], name: 'Rivers at Night', familyPrefix: 'YY', familyStart: 1016, familyEnd: 1023 },
-        { hex: '#2A4B7C', rgb: [42, 75, 124], name: 'Monsoon Poetry', familyPrefix: 'YY', familyStart: 1024, familyEnd: 1031 },
-        { hex: '#00A86B', rgb: [0, 168, 107], name: 'Irish Green', familyPrefix: 'GR', familyStart: 7000, familyEnd: 7007 },
-        { hex: '#98D98E', rgb: [152, 217, 142], name: 'Prim and Proper', familyPrefix: 'GR', familyStart: 7008, familyEnd: 7015 },
-        { hex: '#A3FFB4', rgb: [163, 255, 180], name: 'Glacial Green', familyPrefix: 'GR', familyStart: 7016, familyEnd: 7023 },
-        { hex: '#90EE90', rgb: [144, 238, 144], name: 'Just Moved to Goa', familyPrefix: 'GR', familyStart: 7024, familyEnd: 7031 },
-        { hex: '#3FFF00', rgb: [63, 255, 0], name: 'Harlequin Green', familyPrefix: 'GR', familyStart: 7032, familyEnd: 7039 },
-        { hex: '#52C77A', rgb: [82, 199, 122], name: 'Vegetarian Lunch', familyPrefix: 'GR', familyStart: 7040, familyEnd: 7047 },
-        { hex: '#6B8E23', rgb: [107, 142, 35], name: 'Musk Skin', familyPrefix: 'GR', familyStart: 7048, familyEnd: 7055 },
-        { hex: '#7CCD7C', rgb: [124, 205, 124], name: 'Sincerely Yours', familyPrefix: 'GR', familyStart: 7056, familyEnd: 7063 },
-        { hex: '#A0826D', rgb: [160, 130, 109], name: 'People Magnet', familyPrefix: 'NT', familyStart: 8000, familyEnd: 8007 },
-        { hex: '#C4A57B', rgb: [196, 165, 123], name: 'Gilded Age', familyPrefix: 'NT', familyStart: 8008, familyEnd: 8015 },
-        { hex: '#8B7355', rgb: [139, 115, 85], name: 'Hazelwood', familyPrefix: 'NT', familyStart: 8016, familyEnd: 8023 },
-        { hex: '#9B9381', rgb: [155, 147, 129], name: 'Familiar Strangers', familyPrefix: 'NT', familyStart: 8024, familyEnd: 8031 },
-        { hex: '#7B8E8E', rgb: [123, 142, 142], name: 'Benaras in Winter', familyPrefix: 'NT', familyStart: 8032, familyEnd: 8039 },
-        { hex: '#8B8B7A', rgb: [139, 139, 122], name: 'Olives in Brine', familyPrefix: 'NT', familyStart: 8040, familyEnd: 8047 },
-        { hex: '#B8A799', rgb: [184, 167, 153], name: 'Filigree Earrings', familyPrefix: 'NT', familyStart: 8041, familyEnd: 8048 },
-        { hex: '#8B8680', rgb: [139, 134, 128], name: 'Middle of a Nap', familyPrefix: 'NT', familyStart: 8049, familyEnd: 8056 },
-        { hex: '#DA70D6', rgb: [218, 112, 214], name: 'First Birthday', familyPrefix: 'PR', familyStart: 9000, familyEnd: 9007 },
-        { hex: '#DDA0DD', rgb: [221, 160, 221], name: 'French Summer', familyPrefix: 'PR', familyStart: 9008, familyEnd: 9015 },
-        { hex: '#4B0082', rgb: [75, 0, 130], name: 'Dark Bougainvillea', familyPrefix: 'PR', familyStart: 9016, familyEnd: 9023 },
-        { hex: '#9370DB', rgb: [147, 112, 219], name: 'Little Lilac', familyPrefix: 'PR', familyStart: 9024, familyEnd: 9031 }
-    ];
+    // Empty dataset baseline variable layout tracking
+    let birlaOpusCatalog = [];
+
+    // ASYNCHRONOUS INITIALIZATION: Fetches external local json file structural arrays on boot
+    window.onload = async function() {
+        try {
+            const response = await fetch('catalog.json');
+            if (!response.ok) throw new Error("Database fetch routine failure status.");
+            birlaOpusCatalog = await response.json();
+            
+            document.getElementById('systemStatus').textContent = "JS CLIENT-SIDE BOT READY";
+            forceHexMatch('#F090A4'); // Triggers initial system match layout setup
+        } catch (error) {
+            console.error("Initialization failure: ", error);
+            document.getElementById('systemStatus').textContent = "CATALOG ERROR: JSON MISSING";
+            document.getElementById('systemStatus').style.backgroundColor = "#c0392b";
+        }
+    };
 
     let currentHexGlobal = '#F090A4';
 
-    window.onload = function() {
-        forceHexMatch('#F090A4');
-    };
-
     function forceHexMatch(hexInput) {
+        if (birlaOpusCatalog.length === 0) return;
         let query = hexInput.trim().toUpperCase();
         let matchedChip = null;
 
@@ -476,6 +417,7 @@
     }
 
     function updateDashboardUI(r, g, b) {
+        if (birlaOpusCatalog.length === 0) return;
         document.getElementById('panelWaiting').style.display = 'none';
         document.getElementById('panelDashboard').style.display = 'block';
 
