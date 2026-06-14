@@ -135,7 +135,7 @@
         .settings-sidebar {
             position: fixed;
             top: 0;
-            left: -320px; /* Shifted to hide offscreen left */
+            left: -320px; 
             width: 280px;
             height: 100%;
             background-color: var(--panel-bg);
@@ -145,10 +145,11 @@
             padding: 20px;
             box-sizing: border-box;
             transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
         }
 
         .settings-sidebar.open {
-            left: 0; /* Slides out from the left boundary edge */
+            left: 0; 
         }
 
         .sidebar-overlay {
@@ -181,7 +182,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .theme-option {
@@ -362,12 +363,23 @@
 </head>
 <body class="theme-terracotta">
 
+<!-- BACKGROUND OVERLAY -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
 
+<!-- LEFT-HAND SIDEBAR SETTINGS CONTROL PANEL -->
 <div class="settings-sidebar" id="settingsSidebar">
     <button type="button" class="sidebar-close-btn" onclick="toggleSidebar(false)">X</button>
     <h3 style="margin-top: 0; text-transform: uppercase; border-bottom: 2px solid var(--border); padding-bottom: 8px;">Control Hub</h3>
     
+    <!-- HOUSED MOVED HEX SEARCH BLOCK FIELD -->
+    <div style="margin-top: 15px; border-bottom: 2px dashed var(--border); padding-bottom: 15px;">
+        <label style="display:block; font-weight:bold; margin-bottom:8px; font-size: 0.85rem;">EXACT HEX / CHIP SEARCH:</label>
+        <div style="display:flex; gap:8px;">
+            <input type="text" id="hexInput" value="#F090A4" style="padding:8px; font-family:inherit; font-weight:bold; border:3px solid var(--border); flex:1; font-size: 0.85rem; width: 50px; background: var(--panel-bg); color: var(--text);">
+            <button type="button" class="action-btn" style="padding: 8px 12px; font-size: 0.85rem;" onclick="forceHexMatch(document.getElementById('hexInput').value)">Match</button>
+        </div>
+    </div>
+
     <label style="font-weight: bold; font-size: 0.85rem; display: block; margin-top: 15px;">SELECT SYSTEM INTERFACE THEME:</label>
     <div class="theme-selector">
         <button type="button" class="theme-option active" onclick="changeTheme('terracotta', this)">Terracotta Red</button>
@@ -378,8 +390,10 @@
 
 <div class="dashboard-container">
     
+    <!-- Header wrapper housing vector settings layout button -->
     <div class="header-wrapper">
         <div class="brand-container">
+            <!-- Interlocking vector gear icon -->
             <button type="button" class="settings-trigger" onclick="toggleSidebar(true)" title="Open Hub Config">
                 <svg viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="3"></circle>
@@ -390,30 +404,24 @@
         </div>
     </div>
 
+    <!-- Left Controls Panel Box -->
     <div class="brutal-box">
         <div class="bot-status-tag" id="systemStatus">LOADING ENGINE CATALOG...</div>
         <h3 style="margin-top: 0; font-size: 1.1rem;">System Input Matrix</h3>
 
-        <div class="upload-group">
-            <label style="display:block; font-weight:bold; font-size: 0.85rem;">1. ACQUIRE IMAGE DATA SOURCE:</label>
+        <!-- Section 1: Upload Matrix Controls -->
+        <div class="upload-group" style="border: none; padding: 0; margin: 0;">
+            <label style="display:block; font-weight:bold; font-size: 0.85rem; margin-bottom: 10px;">ACQUIRE IMAGE DATA SOURCE:</label>
             
             <label class="custom-file-upload">
                 📁 Local Image File
                 <input type="file" id="filePicker" accept="image/*" onchange="processImageFile(this)" style="display:none;">
             </label>
 
-            <label class="custom-file-upload" style="background-color: var(--accent);">
+            <label class="custom-file-upload" style="background-color: var(--accent); margin-top: 5px;">
                 📸 Take Photo via Camera
                 <input type="file" id="cameraPicker" accept="image/*" capture="environment" onchange="processImageFile(this)" style="display:none;">
             </label>
-        </div>
-
-        <div>
-            <label style="display:block; font-weight:bold; margin-bottom:8px; font-size: 0.85rem;">2. EXACT HEX / CHIP SEARCH:</label>
-            <div style="display:flex; gap:8px;">
-                <input type="text" id="hexInput" value="#F090A4" style="padding:8px; font-family:inherit; font-weight:bold; border:3px solid var(--border); flex:1; font-size: 0.85rem; width: 50px;">
-                <button type="button" class="action-btn" style="padding: 8px 12px; font-size: 0.85rem;" onclick="forceHexMatch(document.getElementById('hexInput').value)">Match</button>
-            </div>
         </div>
 
         <div id="wrapperBox" class="image-wrapper">
@@ -421,12 +429,15 @@
         </div>
     </div>
 
+    <!-- Right Conditional Dashboard Analysis Box -->
     <div class="brutal-box">
+        <!-- Idle Processing State View -->
         <div id="panelWaiting">
             [ AUTOMATED BOT STANDBY ]<br><br>
             UPLOAD A PAINT CHIP FILE OR IMAGE INPUT FOR PARSING.
         </div>
 
+        <!-- Active Presentation Analysis State View -->
         <div id="panelDashboard">
             <h3 style="margin-top: 0; font-size: 1.1rem;">Spectrum Metrics Output</h3>
             
@@ -443,6 +454,7 @@
             <h4 style="text-transform:uppercase; margin-bottom:8px; font-size: 0.9rem;">Analysis Spectrum Layers</h4>
             <div id="paletteTray"></div>
 
+            <!-- COLOR SHADES FAMILY ROW ENTRY SECTION -->
             <div class="family-matrix-box">
                 <h4 style="text-transform:uppercase; margin: 0 0 4px 0; font-size: 0.9rem;">Color Shades Family Range</h4>
                 <div style="font-size: 11px; font-weight: bold; opacity: 0.8;" id="familyRangeLabel">Family Series: --</div>
@@ -459,7 +471,6 @@
 <script>
     let birlaOpusCatalog = [];
 
-    // ASYNCHRONOUS INITIALIZATION: Loads database file
     window.onload = async function() {
         try {
             const response = await fetch('catalog.json');
@@ -477,7 +488,6 @@
 
     let currentHexGlobal = '#F090A4';
 
-    // Toggle Sidebar visibility routine state changes (Re-routed to Left)
     function toggleSidebar(shouldOpen) {
         const sidebar = document.getElementById('settingsSidebar');
         const overlay = document.getElementById('sidebarOverlay');
@@ -513,16 +523,11 @@
         }
     }
 
-    // Direct execution injection node mapping for manual interactive chip overrides
     function loadDirectShadeFromCode(familyPrefix, codeNumber) {
-        const fullTargetCode = `${familyPrefix}${codeNumber}`;
-        
-        // Custom override logic mapping specifically for hardcoded fandeck overrides
         if (familyPrefix === 'PP' && codeNumber === 4003) { forceHexMatch('#F090A4'); return; }
         if (familyPrefix === 'YY' && codeNumber === 1000) { forceHexMatch('#0B132B'); return; }
         if (familyPrefix === 'RD' && codeNumber === 5016) { forceHexMatch('#E27278'); return; }
 
-        // General structural search lookup matching engine paths
         let exactMatch = birlaOpusCatalog.find(item => {
             let itemCodeStart = item.familyStart;
             let itemCodeEnd = item.familyEnd;
@@ -640,14 +645,11 @@
             const codeString = `${prefix}${currentCode}`;
             badge.textContent = codeString;
             
-            // Highlight checking routines
             if (matchedItem.name === 'Pink Azaleas' && currentCode === 4003) badge.className += ' highlight';
             if (matchedItem.name === 'Mumbai at Midnight' && currentCode === 1000) badge.className += ' highlight';
             if (matchedItem.name === 'Mimosas at Sunset' && currentCode === 5016) badge.className += ' highlight';
 
-            // INTERACTIVE CAPTURE BOUND NODE TRIGGER PIPELINES
             badge.setAttribute('onclick', `loadDirectShadeFromCode('${prefix}', ${currentCode})`);
-
             badgeContainer.appendChild(badge);
         }
     }
@@ -656,6 +658,7 @@
         return Math.sqrt(2 * Math.pow(c1.r - c2.r, 2) + 4 * Math.pow(c1.g - c2.g, 2) + 3 * Math.pow(c1.b - c2.b, 2));
     }
 
+    // Dynamic text input background correction rules for input elements inside dark mode containers
     function hexToRgb(hex) {
         const parts = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return parts ? { r: parseInt(parts[1], 16), g: parseInt(parts[2], 16), b: parseInt(parts[3], 16) } : null;
@@ -671,7 +674,6 @@
         }
     }
 
-    // Handles layout theme variations
     function changeTheme(theme, element) {
         document.body.className = 'theme-' + theme;
         document.querySelectorAll('.theme-option').forEach(btn => btn.classList.remove('active'));
